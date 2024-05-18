@@ -8940,6 +8940,90 @@
 <a href="#8940" id="8940">8940</a>
 <a href="#8941" id="8941">8941</a>
 <a href="#8942" id="8942">8942</a>
+<a href="#8943" id="8943">8943</a>
+<a href="#8944" id="8944">8944</a>
+<a href="#8945" id="8945">8945</a>
+<a href="#8946" id="8946">8946</a>
+<a href="#8947" id="8947">8947</a>
+<a href="#8948" id="8948">8948</a>
+<a href="#8949" id="8949">8949</a>
+<a href="#8950" id="8950">8950</a>
+<a href="#8951" id="8951">8951</a>
+<a href="#8952" id="8952">8952</a>
+<a href="#8953" id="8953">8953</a>
+<a href="#8954" id="8954">8954</a>
+<a href="#8955" id="8955">8955</a>
+<a href="#8956" id="8956">8956</a>
+<a href="#8957" id="8957">8957</a>
+<a href="#8958" id="8958">8958</a>
+<a href="#8959" id="8959">8959</a>
+<a href="#8960" id="8960">8960</a>
+<a href="#8961" id="8961">8961</a>
+<a href="#8962" id="8962">8962</a>
+<a href="#8963" id="8963">8963</a>
+<a href="#8964" id="8964">8964</a>
+<a href="#8965" id="8965">8965</a>
+<a href="#8966" id="8966">8966</a>
+<a href="#8967" id="8967">8967</a>
+<a href="#8968" id="8968">8968</a>
+<a href="#8969" id="8969">8969</a>
+<a href="#8970" id="8970">8970</a>
+<a href="#8971" id="8971">8971</a>
+<a href="#8972" id="8972">8972</a>
+<a href="#8973" id="8973">8973</a>
+<a href="#8974" id="8974">8974</a>
+<a href="#8975" id="8975">8975</a>
+<a href="#8976" id="8976">8976</a>
+<a href="#8977" id="8977">8977</a>
+<a href="#8978" id="8978">8978</a>
+<a href="#8979" id="8979">8979</a>
+<a href="#8980" id="8980">8980</a>
+<a href="#8981" id="8981">8981</a>
+<a href="#8982" id="8982">8982</a>
+<a href="#8983" id="8983">8983</a>
+<a href="#8984" id="8984">8984</a>
+<a href="#8985" id="8985">8985</a>
+<a href="#8986" id="8986">8986</a>
+<a href="#8987" id="8987">8987</a>
+<a href="#8988" id="8988">8988</a>
+<a href="#8989" id="8989">8989</a>
+<a href="#8990" id="8990">8990</a>
+<a href="#8991" id="8991">8991</a>
+<a href="#8992" id="8992">8992</a>
+<a href="#8993" id="8993">8993</a>
+<a href="#8994" id="8994">8994</a>
+<a href="#8995" id="8995">8995</a>
+<a href="#8996" id="8996">8996</a>
+<a href="#8997" id="8997">8997</a>
+<a href="#8998" id="8998">8998</a>
+<a href="#8999" id="8999">8999</a>
+<a href="#9000" id="9000">9000</a>
+<a href="#9001" id="9001">9001</a>
+<a href="#9002" id="9002">9002</a>
+<a href="#9003" id="9003">9003</a>
+<a href="#9004" id="9004">9004</a>
+<a href="#9005" id="9005">9005</a>
+<a href="#9006" id="9006">9006</a>
+<a href="#9007" id="9007">9007</a>
+<a href="#9008" id="9008">9008</a>
+<a href="#9009" id="9009">9009</a>
+<a href="#9010" id="9010">9010</a>
+<a href="#9011" id="9011">9011</a>
+<a href="#9012" id="9012">9012</a>
+<a href="#9013" id="9013">9013</a>
+<a href="#9014" id="9014">9014</a>
+<a href="#9015" id="9015">9015</a>
+<a href="#9016" id="9016">9016</a>
+<a href="#9017" id="9017">9017</a>
+<a href="#9018" id="9018">9018</a>
+<a href="#9019" id="9019">9019</a>
+<a href="#9020" id="9020">9020</a>
+<a href="#9021" id="9021">9021</a>
+<a href="#9022" id="9022">9022</a>
+<a href="#9023" id="9023">9023</a>
+<a href="#9024" id="9024">9024</a>
+<a href="#9025" id="9025">9025</a>
+<a href="#9026" id="9026">9026</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -9099,6 +9183,8 @@
         (<span class="kw">_</span>, LargeList(list_to)) =&gt; can_cast_types(from_type, list_to.data_type()),
         (<span class="kw">_</span>, FixedSizeList(list_to,size)) <span class="kw">if </span><span class="kw-2">*</span>size == <span class="number">1 </span>=&gt; {
             can_cast_types(from_type, list_to.data_type())},
+        (FixedSizeList(list_from,size), <span class="kw">_</span>) <span class="kw">if </span><span class="kw-2">*</span>size == <span class="number">1 </span>=&gt; {
+            can_cast_types(list_from.data_type(), to_type)},
         <span class="comment">// cast one decimal type to another decimal type
         </span>(Decimal128(<span class="kw">_</span>, <span class="kw">_</span>), Decimal128(<span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
         (Decimal256(<span class="kw">_</span>, <span class="kw">_</span>), Decimal256(<span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
@@ -9653,6 +9739,9 @@
         (<span class="kw">_</span>, LargeList(<span class="kw-2">ref </span>to)) =&gt; cast_values_to_list::&lt;i64&gt;(array, to, cast_options),
         (<span class="kw">_</span>, FixedSizeList(<span class="kw-2">ref </span>to, size)) <span class="kw">if </span><span class="kw-2">*</span>size == <span class="number">1 </span>=&gt; {
             cast_values_to_fixed_size_list(array, to, <span class="kw-2">*</span>size, cast_options)
+        }
+        (FixedSizeList(<span class="kw">_</span>, size), <span class="kw">_</span>) <span class="kw">if </span><span class="kw-2">*</span>size == <span class="number">1 </span>=&gt; {
+            cast_single_element_fixed_size_list_to_values(array, to_type, cast_options)
         }
         (Decimal128(<span class="kw">_</span>, s1), Decimal128(p2, s2)) =&gt; {
             cast_decimal_to_decimal_same_type::&lt;Decimal128Type&gt;(
@@ -15835,6 +15924,85 @@
         <span class="kw">let </span>expect =
             FixedSizeListArray::from_iter_primitive::&lt;Int32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;([<span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">5</span>)])], <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>expect.value(<span class="number">0</span>), <span class="kw-2">&amp;</span>actual.value(<span class="number">0</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_single_element_fixed_size_list() {
+        <span class="comment">// FixedSizeList&lt;T&gt;[1] =&gt; T
+        </span><span class="kw">let </span>from_array = Arc::new(FixedSizeListArray::from_iter_primitive::&lt;Int16Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
+            [(<span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">5</span>)]))],
+            <span class="number">1</span>,
+        )) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>casted_array = cast(<span class="kw-2">&amp;</span>from_array, <span class="kw-2">&amp;</span>DataType::Int32).unwrap();
+        <span class="kw">let </span>actual: <span class="kw-2">&amp;</span>Int32Array = casted_array.as_primitive();
+        <span class="kw">let </span>expected = Int32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">5</span>)]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>expected, actual);
+
+        <span class="comment">// FixedSizeList&lt;T&gt;[1] =&gt; FixedSizeList&lt;U&gt;[1]
+        </span><span class="kw">let </span>from_array = Arc::new(FixedSizeListArray::from_iter_primitive::&lt;Int16Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
+            [(<span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">5</span>)]))],
+            <span class="number">1</span>,
+        )) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>to_field = Arc::new(Field::new(<span class="string">"dummy"</span>, DataType::Float32, <span class="bool-val">false</span>));
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>from_array, <span class="kw-2">&amp;</span>DataType::FixedSizeList(to_field.clone(), <span class="number">1</span>)).unwrap();
+        <span class="kw">let </span>expected = Arc::new(FixedSizeListArray::new(
+            to_field.clone(),
+            <span class="number">1</span>,
+            Arc::new(Float32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">5.0</span>)])) <span class="kw">as </span>ArrayRef,
+            <span class="prelude-val">None</span>,
+        )) <span class="kw">as </span>ArrayRef;
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>expected, <span class="kw-2">*</span>actual);
+
+        <span class="comment">// FixedSizeList&lt;T&gt;[1] =&gt; FixedSizeList&lt;FixdSizedList&lt;U&gt;[1]&gt;[1]
+        </span><span class="kw">let </span>from_array = Arc::new(FixedSizeListArray::from_iter_primitive::&lt;Int16Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
+            [(<span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">5</span>)]))],
+            <span class="number">1</span>,
+        )) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>to_field_inner = Arc::new(Field::new(<span class="string">"item"</span>, DataType::Float32, <span class="bool-val">false</span>));
+        <span class="kw">let </span>to_field = Arc::new(Field::new(
+            <span class="string">"dummy"</span>,
+            DataType::FixedSizeList(to_field_inner.clone(), <span class="number">1</span>),
+            <span class="bool-val">false</span>,
+        ));
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>from_array, <span class="kw-2">&amp;</span>DataType::FixedSizeList(to_field.clone(), <span class="number">1</span>)).unwrap();
+        <span class="kw">let </span>expected = Arc::new(FixedSizeListArray::new(
+            to_field.clone(),
+            <span class="number">1</span>,
+            Arc::new(FixedSizeListArray::new(
+                to_field_inner.clone(),
+                <span class="number">1</span>,
+                Arc::new(Float32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">5.0</span>)])) <span class="kw">as </span>ArrayRef,
+                <span class="prelude-val">None</span>,
+            )) <span class="kw">as </span>ArrayRef,
+            <span class="prelude-val">None</span>,
+        )) <span class="kw">as </span>ArrayRef;
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>expected, <span class="kw-2">*</span>actual);
+
+        <span class="comment">// T =&gt; FixedSizeList&lt;T&gt;[1] (non-nullable)
+        </span><span class="kw">let </span>field = Arc::new(Field::new(<span class="string">"dummy"</span>, DataType::Float32, <span class="bool-val">false</span>));
+        <span class="kw">let </span>from_array = Arc::new(Int8Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">5</span>)])) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>casted_array = cast(<span class="kw-2">&amp;</span>from_array, <span class="kw-2">&amp;</span>DataType::FixedSizeList(field.clone(), <span class="number">1</span>)).unwrap();
+        <span class="kw">let </span>actual = casted_array.as_fixed_size_list();
+        <span class="kw">let </span>expected = Arc::new(FixedSizeListArray::new(
+            field.clone(),
+            <span class="number">1</span>,
+            Arc::new(Float32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">5.0</span>)])) <span class="kw">as </span>ArrayRef,
+            <span class="prelude-val">None</span>,
+        )) <span class="kw">as </span>ArrayRef;
+        <span class="macro">assert_eq!</span>(expected.as_ref(), actual);
+
+        <span class="comment">// T =&gt; FixedSizeList&lt;T&gt;[1] (nullable)
+        </span><span class="kw">let </span>field = Arc::new(Field::new(<span class="string">"nullable"</span>, DataType::Float32, <span class="bool-val">true</span>));
+        <span class="kw">let </span>from_array = Arc::new(Int8Array::from(<span class="macro">vec!</span>[<span class="prelude-val">None</span>])) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>casted_array = cast(<span class="kw-2">&amp;</span>from_array, <span class="kw-2">&amp;</span>DataType::FixedSizeList(field.clone(), <span class="number">1</span>)).unwrap();
+        <span class="kw">let </span>actual = casted_array.as_fixed_size_list();
+        <span class="kw">let </span>expected = Arc::new(FixedSizeListArray::new(
+            field.clone(),
+            <span class="number">1</span>,
+            Arc::new(Float32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">None</span>])) <span class="kw">as </span>ArrayRef,
+            <span class="prelude-val">None</span>,
+        )) <span class="kw">as </span>ArrayRef;
+        <span class="macro">assert_eq!</span>(expected.as_ref(), actual);
     }
 
     <span class="attr">#[test]
