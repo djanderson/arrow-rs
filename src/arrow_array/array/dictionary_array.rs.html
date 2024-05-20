@@ -2329,7 +2329,7 @@
 ///         return Ok(d.with_values(r));
 ///     }
 ///     downcast_primitive_array! {
-///         a =&gt; Ok(Arc::new(a.iter().map(|x| x.map(|x| x.to_string())).collect::&lt;StringArray&gt;())),
+///         a =&gt; Ok(Arc::new(a.iter().map(|x| x.map(|x| format!("{x:?}"))).collect::&lt;StringArray&gt;())),
 ///         d =&gt; Err(ArrowError::InvalidArgumentError(format!("{d:?} not supported")))
 ///     }
 /// }

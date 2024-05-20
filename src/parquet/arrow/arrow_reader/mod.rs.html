@@ -3275,6 +3275,10 @@
 <a href="#3275" id="3275">3275</a>
 <a href="#3276" id="3276">3276</a>
 <a href="#3277" id="3277">3277</a>
+<a href="#3278" id="3278">3278</a>
+<a href="#3279" id="3279">3279</a>
+<a href="#3280" id="3280">3280</a>
+<a href="#3281" id="3281">3281</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -4027,7 +4031,7 @@
         Decimal128Type, Decimal256Type, DecimalType, Float16Type, Float32Type, Float64Type,
     };
     <span class="kw">use </span>arrow_array::<span class="kw-2">*</span>;
-    <span class="kw">use </span>arrow_buffer::{i256, ArrowNativeType, Buffer};
+    <span class="kw">use </span>arrow_buffer::{i256, ArrowNativeType, Buffer, IntervalDayTime};
     <span class="kw">use </span>arrow_data::ArrayDataBuilder;
     <span class="kw">use </span>arrow_schema::{ArrowError, DataType <span class="kw">as </span>ArrowDataType, Field, Fields, Schema};
     <span class="kw">use </span>arrow_select::concat::concat_batches;
@@ -4337,8 +4341,12 @@
                 Arc::new(
                     vals.iter()
                         .map(|x| {
-                            x.as_ref()
-                                .map(|b| i64::from_le_bytes(b.as_ref()[<span class="number">4</span>..<span class="number">12</span>].try_into().unwrap()))
+                            x.as_ref().map(|b| IntervalDayTime {
+                                days: i32::from_le_bytes(b.as_ref()[<span class="number">4</span>..<span class="number">8</span>].try_into().unwrap()),
+                                milliseconds: i32::from_le_bytes(
+                                    b.as_ref()[<span class="number">8</span>..<span class="number">12</span>].try_into().unwrap(),
+                                ),
+                            })
                         })
                         .collect::&lt;IntervalDayTimeArray&gt;(),
                 )

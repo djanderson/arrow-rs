@@ -1233,7 +1233,7 @@
     <span class="kw">use </span>arrow_array::builder::<span class="kw-2">*</span>;
     <span class="kw">use </span>arrow_array::types::<span class="kw-2">*</span>;
     <span class="kw">use </span>arrow_array::<span class="kw-2">*</span>;
-    <span class="kw">use </span>arrow_buffer::ScalarBuffer;
+    <span class="kw">use </span>arrow_buffer::{IntervalDayTime, IntervalMonthDayNano, ScalarBuffer};
     <span class="kw">use </span>arrow_schema::<span class="kw-2">*</span>;
 
     <span class="kw">use </span><span class="kw">crate</span>::display::array_value_to_string;
@@ -2054,12 +2054,12 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_pretty_format_interval_day_time() {
         <span class="kw">let </span>arr = Arc::new(arrow_array::IntervalDayTimeArray::from(<span class="macro">vec!</span>[
-            <span class="prelude-val">Some</span>(-<span class="number">600000</span>),
-            <span class="prelude-val">Some</span>(<span class="number">4294966295</span>),
-            <span class="prelude-val">Some</span>(<span class="number">4294967295</span>),
-            <span class="prelude-val">Some</span>(<span class="number">1</span>),
-            <span class="prelude-val">Some</span>(<span class="number">10</span>),
-            <span class="prelude-val">Some</span>(<span class="number">100</span>),
+            <span class="prelude-val">Some</span>(IntervalDayTime::new(-<span class="number">1</span>, -<span class="number">600_000</span>)),
+            <span class="prelude-val">Some</span>(IntervalDayTime::new(<span class="number">0</span>, -<span class="number">1001</span>)),
+            <span class="prelude-val">Some</span>(IntervalDayTime::new(<span class="number">0</span>, -<span class="number">1</span>)),
+            <span class="prelude-val">Some</span>(IntervalDayTime::new(<span class="number">0</span>, <span class="number">1</span>)),
+            <span class="prelude-val">Some</span>(IntervalDayTime::new(<span class="number">0</span>, <span class="number">10</span>)),
+            <span class="prelude-val">Some</span>(IntervalDayTime::new(<span class="number">0</span>, <span class="number">100</span>)),
         ]));
 
         <span class="kw">let </span>schema = Arc::new(Schema::new(<span class="macro">vec!</span>[Field::new(
@@ -2093,19 +2093,19 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_pretty_format_interval_month_day_nano_array() {
         <span class="kw">let </span>arr = Arc::new(arrow_array::IntervalMonthDayNanoArray::from(<span class="macro">vec!</span>[
-            <span class="prelude-val">Some</span>(-<span class="number">600000000000</span>),
-            <span class="prelude-val">Some</span>(<span class="number">18446744072709551615</span>),
-            <span class="prelude-val">Some</span>(<span class="number">18446744073709551615</span>),
-            <span class="prelude-val">Some</span>(<span class="number">1</span>),
-            <span class="prelude-val">Some</span>(<span class="number">10</span>),
-            <span class="prelude-val">Some</span>(<span class="number">100</span>),
-            <span class="prelude-val">Some</span>(<span class="number">1_000</span>),
-            <span class="prelude-val">Some</span>(<span class="number">10_000</span>),
-            <span class="prelude-val">Some</span>(<span class="number">100_000</span>),
-            <span class="prelude-val">Some</span>(<span class="number">1_000_000</span>),
-            <span class="prelude-val">Some</span>(<span class="number">10_000_000</span>),
-            <span class="prelude-val">Some</span>(<span class="number">100_000_000</span>),
-            <span class="prelude-val">Some</span>(<span class="number">1_000_000_000</span>),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(-<span class="number">1</span>, -<span class="number">1</span>, -<span class="number">600_000_000_000</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, -<span class="number">1_000_000_001</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, -<span class="number">1</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1_000</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10_000</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100_000</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1_000_000</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10_000_000</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100_000_000</span>)),
+            <span class="prelude-val">Some</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1_000_000_000</span>)),
         ]));
 
         <span class="kw">let </span>schema = Arc::new(Schema::new(<span class="macro">vec!</span>[Field::new(

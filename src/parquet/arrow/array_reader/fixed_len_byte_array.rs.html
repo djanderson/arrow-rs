@@ -465,6 +465,13 @@
 <a href="#465" id="465">465</a>
 <a href="#466" id="466">466</a>
 <a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -497,7 +504,7 @@
     ArrayRef, Decimal128Array, Decimal256Array, FixedSizeBinaryArray, Float16Array,
     IntervalDayTimeArray, IntervalYearMonthArray,
 };
-<span class="kw">use </span>arrow_buffer::{i256, Buffer};
+<span class="kw">use </span>arrow_buffer::{i256, Buffer, IntervalDayTime};
 <span class="kw">use </span>arrow_data::ArrayDataBuilder;
 <span class="kw">use </span>arrow_schema::{DataType <span class="kw">as </span>ArrowType, IntervalUnit};
 <span class="kw">use </span>bytes::Bytes;
@@ -662,7 +669,14 @@
                     IntervalUnit::DayTime =&gt; Arc::new(
                         binary
                             .iter()
-                            .map(|o| o.map(|b| i64::from_le_bytes(b[<span class="number">4</span>..<span class="number">12</span>].try_into().unwrap())))
+                            .map(|o| {
+                                o.map(|b| {
+                                    IntervalDayTime::new(
+                                        i32::from_le_bytes(b[<span class="number">4</span>..<span class="number">8</span>].try_into().unwrap()),
+                                        i32::from_le_bytes(b[<span class="number">8</span>..<span class="number">12</span>].try_into().unwrap()),
+                                    )
+                                })
+                            })
                             .collect::&lt;IntervalDayTimeArray&gt;(),
                     ) <span class="kw">as </span>ArrayRef,
                     IntervalUnit::MonthDayNano =&gt; {

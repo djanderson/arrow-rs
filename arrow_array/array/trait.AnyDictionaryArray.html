@@ -17,7 +17,7 @@ keys without needing to create specialized implementations for each key type</p>
         <span class="kw">return </span><span class="prelude-val">Ok</span>(d.with_values(r));
     }
     <span class="macro">downcast_primitive_array!</span> {
-        a =&gt; <span class="prelude-val">Ok</span>(Arc::new(a.iter().map(|x| x.map(|x| x.to_string())).collect::&lt;StringArray&gt;())),
+        a =&gt; <span class="prelude-val">Ok</span>(Arc::new(a.iter().map(|x| x.map(|x| <span class="macro">format!</span>(<span class="string">"{x:?}"</span>))).collect::&lt;StringArray&gt;())),
         d =&gt; <span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(<span class="string">"{d:?} not supported"</span>)))
     }
 }

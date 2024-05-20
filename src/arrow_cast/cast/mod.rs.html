@@ -9013,17 +9013,6 @@
 <a href="#9013" id="9013">9013</a>
 <a href="#9014" id="9014">9014</a>
 <a href="#9015" id="9015">9015</a>
-<a href="#9016" id="9016">9016</a>
-<a href="#9017" id="9017">9017</a>
-<a href="#9018" id="9018">9018</a>
-<a href="#9019" id="9019">9019</a>
-<a href="#9020" id="9020">9020</a>
-<a href="#9021" id="9021">9021</a>
-<a href="#9022" id="9022">9022</a>
-<a href="#9023" id="9023">9023</a>
-<a href="#9024" id="9024">9024</a>
-<a href="#9025" id="9025">9025</a>
-<a href="#9026" id="9026">9026</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -9072,7 +9061,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::cast::list::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::cast::string::<span class="kw-2">*</span>;
 
-<span class="kw">use </span>arrow_buffer::ScalarBuffer;
+<span class="kw">use </span>arrow_buffer::{IntervalMonthDayNano, ScalarBuffer};
 <span class="kw">use </span>arrow_data::ByteView;
 <span class="kw">use </span>chrono::{NaiveTime, Offset, TimeZone, Utc};
 <span class="kw">use </span>std::cmp::Ordering;
@@ -9303,11 +9292,6 @@
             DayTime =&gt; <span class="bool-val">false</span>,
             MonthDayNano =&gt; <span class="bool-val">false</span>,
         },
-        (Int64, Interval(to_type)) =&gt; <span class="kw">match </span>to_type {
-            YearMonth =&gt; <span class="bool-val">false</span>,
-            DayTime =&gt; <span class="bool-val">true</span>,
-            MonthDayNano =&gt; <span class="bool-val">false</span>,
-        },
         (Duration(<span class="kw">_</span>), Interval(MonthDayNano)) =&gt; <span class="bool-val">true</span>,
         (Interval(MonthDayNano), Duration(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
         (Interval(YearMonth), Interval(MonthDayNano)) =&gt; <span class="bool-val">true</span>,
@@ -9420,9 +9404,9 @@
     };
 
     <span class="kw">if </span>cast_options.safe {
-        <span class="kw">let </span>iter = array
-            .iter()
-            .map(|v| v.and_then(|v| (v &gt;&gt; <span class="number">64 </span>== <span class="number">0</span>).then_some((v <span class="kw">as </span>i64) / scale)));
+        <span class="kw">let </span>iter = array.iter().map(|v| {
+            v.and_then(|v| (v.days == <span class="number">0 </span>&amp;&amp; v.months == <span class="number">0</span>).then_some(v.nanoseconds / scale))
+        });
         <span class="prelude-val">Ok</span>(Arc::new(<span class="kw">unsafe </span>{
             PrimitiveArray::&lt;D&gt;::from_trusted_len_iter(iter)
         }))
@@ -9430,8 +9414,8 @@
         <span class="kw">let </span>vec = array
             .iter()
             .map(|v| {
-                v.map(|v| <span class="kw">match </span>v &gt;&gt; <span class="number">64 </span>{
-                    <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>((v <span class="kw">as </span>i64) / scale),
+                v.map(|v| <span class="kw">match </span>v.days == <span class="number">0 </span>&amp;&amp; v.months == <span class="number">0 </span>{
+                    <span class="bool-val">true </span>=&gt; <span class="prelude-val">Ok</span>((v.nanoseconds) / scale),
                     <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ArrowError::ComputeError(
                         <span class="string">"Cannot convert interval containing non-zero months or days to duration"
                             </span>.to_string(),
@@ -9470,9 +9454,12 @@
     };
 
     <span class="kw">if </span>cast_options.safe {
-        <span class="kw">let </span>iter = array
-            .iter()
-            .map(|v| v.and_then(|v| v.checked_mul(scale).map(|v| v <span class="kw">as </span>i128)));
+        <span class="kw">let </span>iter = array.iter().map(|v| {
+            v.and_then(|v| {
+                v.checked_mul(scale)
+                    .map(|v| IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, v))
+            })
+        });
         <span class="prelude-val">Ok</span>(Arc::new(<span class="kw">unsafe </span>{
             PrimitiveArray::&lt;IntervalMonthDayNanoType&gt;::from_trusted_len_iter(iter)
         }))
@@ -9482,7 +9469,7 @@
             .map(|v| {
                 v.map(|v| {
                     <span class="kw">if let </span><span class="prelude-val">Ok</span>(v) = v.mul_checked(scale) {
-                        <span class="prelude-val">Ok</span>(v <span class="kw">as </span>i128)
+                        <span class="prelude-val">Ok</span>(IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, v))
                     } <span class="kw">else </span>{
                         <span class="prelude-val">Err</span>(ArrowError::ComputeError(<span class="macro">format!</span>(
                             <span class="string">"Cannot cast to {:?}. Overflowing on {:?}"</span>,
@@ -10990,17 +10977,8 @@
         (Interval(IntervalUnit::DayTime), Interval(IntervalUnit::MonthDayNano)) =&gt; {
             cast_interval_day_time_to_interval_month_day_nano(array, cast_options)
         }
-        (Interval(IntervalUnit::YearMonth), Int64) =&gt; {
-            cast_numeric_arrays::&lt;IntervalYearMonthType, Int64Type&gt;(array, cast_options)
-        }
-        (Interval(IntervalUnit::DayTime), Int64) =&gt; {
-            cast_reinterpret_arrays::&lt;IntervalDayTimeType, Int64Type&gt;(array)
-        }
         (Int32, Interval(IntervalUnit::YearMonth)) =&gt; {
             cast_reinterpret_arrays::&lt;Int32Type, IntervalYearMonthType&gt;(array)
-        }
-        (Int64, Interval(IntervalUnit::DayTime)) =&gt; {
-            cast_reinterpret_arrays::&lt;Int64Type, IntervalDayTimeType&gt;(array)
         }
         (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(ArrowError::CastError(<span class="macro">format!</span>(
             <span class="string">"Casting from {from_type:?} to {to_type:?} not supported"</span>,
@@ -11366,7 +11344,7 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>arrow_buffer::{Buffer, NullBuffer};
+    <span class="kw">use </span>arrow_buffer::{Buffer, IntervalDayTime, NullBuffer};
     <span class="kw">use </span>chrono::NaiveDate;
     <span class="kw">use </span>half::f16;
 
@@ -14083,25 +14061,6 @@
         ];
 
         <span class="kw">for </span>arr <span class="kw">in </span>duration_arrays {
-            <span class="macro">assert!</span>(can_cast_types(arr.data_type(), <span class="kw-2">&amp;</span>DataType::Int64));
-            <span class="kw">let </span>result = cast(<span class="kw-2">&amp;</span>arr, <span class="kw-2">&amp;</span>DataType::Int64).unwrap();
-            <span class="kw">let </span>result = result.as_primitive::&lt;Int64Type&gt;();
-            <span class="macro">assert_eq!</span>(base.as_slice(), result.values());
-        }
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_cast_interval_to_i64() {
-        <span class="kw">let </span>base = <span class="macro">vec!</span>[<span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>];
-
-        <span class="kw">let </span>interval_arrays = <span class="macro">vec!</span>[
-            Arc::new(IntervalDayTimeArray::from(base.clone())) <span class="kw">as </span>ArrayRef,
-            Arc::new(IntervalYearMonthArray::from(
-                base.iter().map(|x| <span class="kw-2">*</span>x <span class="kw">as </span>i32).collect::&lt;Vec&lt;i32&gt;&gt;(),
-            )) <span class="kw">as </span>ArrayRef,
-        ];
-
-        <span class="kw">for </span>arr <span class="kw">in </span>interval_arrays {
             <span class="macro">assert!</span>(can_cast_types(arr.data_type(), <span class="kw-2">&amp;</span>DataType::Int64));
             <span class="kw">let </span>result = cast(<span class="kw-2">&amp;</span>arr, <span class="kw-2">&amp;</span>DataType::Int64).unwrap();
             <span class="kw">let </span>result = result.as_primitive::&lt;Int64Type&gt;();
@@ -17517,7 +17476,10 @@
             casted_array.data_type(),
             <span class="kw-2">&amp;</span>DataType::Interval(IntervalUnit::MonthDayNano)
         );
-        <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">1234567000000000</span>);
+        <span class="macro">assert_eq!</span>(
+            casted_array.value(<span class="number">0</span>),
+            IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1234567000000000</span>)
+        );
 
         <span class="kw">let </span>array = <span class="macro">vec!</span>[i64::MAX];
         <span class="kw">let </span>casted_array = cast_from_duration_to_interval::&lt;DurationSecondType&gt;(
@@ -17547,7 +17509,10 @@
             casted_array.data_type(),
             <span class="kw-2">&amp;</span>DataType::Interval(IntervalUnit::MonthDayNano)
         );
-        <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">1234567000000</span>);
+        <span class="macro">assert_eq!</span>(
+            casted_array.value(<span class="number">0</span>),
+            IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1234567000000</span>)
+        );
 
         <span class="kw">let </span>array = <span class="macro">vec!</span>[i64::MAX];
         <span class="kw">let </span>casted_array = cast_from_duration_to_interval::&lt;DurationMillisecondType&gt;(
@@ -17577,7 +17542,10 @@
             casted_array.data_type(),
             <span class="kw-2">&amp;</span>DataType::Interval(IntervalUnit::MonthDayNano)
         );
-        <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">1234567000</span>);
+        <span class="macro">assert_eq!</span>(
+            casted_array.value(<span class="number">0</span>),
+            IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1234567000</span>)
+        );
 
         <span class="kw">let </span>array = <span class="macro">vec!</span>[i64::MAX];
         <span class="kw">let </span>casted_array = cast_from_duration_to_interval::&lt;DurationMicrosecondType&gt;(
@@ -17607,7 +17575,10 @@
             casted_array.data_type(),
             <span class="kw-2">&amp;</span>DataType::Interval(IntervalUnit::MonthDayNano)
         );
-        <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">1234567</span>);
+        <span class="macro">assert_eq!</span>(
+            casted_array.value(<span class="number">0</span>),
+            IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1234567</span>)
+        );
 
         <span class="kw">let </span>array = <span class="macro">vec!</span>[i64::MAX];
         <span class="kw">let </span>casted_array = cast_from_duration_to_interval::&lt;DurationNanosecondType&gt;(
@@ -17618,7 +17589,10 @@
             },
         )
         .unwrap();
-        <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">9223372036854775807</span>);
+        <span class="macro">assert_eq!</span>(
+            casted_array.value(<span class="number">0</span>),
+            IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, i64::MAX)
+        );
     }
 
     <span class="doccomment">/// helper function to test casting from interval to duration
@@ -17643,14 +17617,15 @@
             safe: <span class="bool-val">false</span>,
             format_options: FormatOptions::default(),
         };
+        <span class="kw">let </span>v = IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1234567</span>);
 
         <span class="comment">// from interval month day nano to duration second
-        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>].into();
+        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[v].into();
         <span class="kw">let </span>casted_array: DurationSecondArray =
             cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">0</span>);
 
-        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX].into();
+        <span class="kw">let </span>array = <span class="macro">vec!</span>[IntervalMonthDayNano::MAX].into();
         <span class="kw">let </span>casted_array: DurationSecondArray =
             cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">0</span>));
@@ -17659,12 +17634,12 @@
         <span class="macro">assert!</span>(res.is_err());
 
         <span class="comment">// from interval month day nano to duration millisecond
-        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>].into();
+        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[v].into();
         <span class="kw">let </span>casted_array: DurationMillisecondArray =
             cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">1</span>);
 
-        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX].into();
+        <span class="kw">let </span>array = <span class="macro">vec!</span>[IntervalMonthDayNano::MAX].into();
         <span class="kw">let </span>casted_array: DurationMillisecondArray =
             cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">0</span>));
@@ -17673,12 +17648,12 @@
         <span class="macro">assert!</span>(res.is_err());
 
         <span class="comment">// from interval month day nano to duration microsecond
-        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>].into();
+        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[v].into();
         <span class="kw">let </span>casted_array: DurationMicrosecondArray =
             cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">1234</span>);
 
-        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX].into();
+        <span class="kw">let </span>array = <span class="macro">vec!</span>[IntervalMonthDayNano::MAX].into();
         <span class="kw">let </span>casted_array =
             cast_from_interval_to_duration::&lt;DurationMicrosecondType&gt;(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">0</span>));
@@ -17688,12 +17663,12 @@
         <span class="macro">assert!</span>(casted_array.is_err());
 
         <span class="comment">// from interval month day nano to duration nanosecond
-        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>].into();
+        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[v].into();
         <span class="kw">let </span>casted_array: DurationNanosecondArray =
             cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">1234567</span>);
 
-        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX].into();
+        <span class="kw">let </span>array = <span class="macro">vec!</span>[IntervalMonthDayNano::MAX].into();
         <span class="kw">let </span>casted_array: DurationNanosecondArray =
             cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">0</span>));
@@ -17756,12 +17731,15 @@
             casted_array.data_type(),
             <span class="kw-2">&amp;</span>DataType::Interval(IntervalUnit::MonthDayNano)
         );
-        <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">97812474910747780469848774134464512</span>);
+        <span class="macro">assert_eq!</span>(
+            casted_array.value(<span class="number">0</span>),
+            IntervalMonthDayNano::new(<span class="number">1234567</span>, <span class="number">0</span>, <span class="number">0</span>)
+        );
     }
 
     <span class="doccomment">/// helper function to test casting from interval day time to interval month day nano
     </span><span class="kw">fn </span>cast_from_interval_day_time_to_interval_month_day_nano(
-        array: Vec&lt;i64&gt;,
+        array: Vec&lt;IntervalDayTime&gt;,
         cast_options: <span class="kw-2">&amp;</span>CastOptions,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PrimitiveArray&lt;IntervalMonthDayNanoType&gt;, ArrowError&gt; {
         <span class="kw">let </span>array = PrimitiveArray::&lt;IntervalDayTimeType&gt;::from(array);
@@ -17779,7 +17757,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_cast_from_interval_day_time_to_interval_month_day_nano() {
         <span class="comment">// from interval day time to interval month day nano
-        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">123</span>];
+        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[IntervalDayTime::new(<span class="number">123</span>, <span class="number">0</span>)];
         <span class="kw">let </span>casted_array =
             cast_from_interval_day_time_to_interval_month_day_nano(array, <span class="kw-2">&amp;</span>CastOptions::default())
                 .unwrap();
@@ -17787,7 +17765,7 @@
             casted_array.data_type(),
             <span class="kw-2">&amp;</span>DataType::Interval(IntervalUnit::MonthDayNano)
         );
-        <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">123000000</span>);
+        <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), IntervalMonthDayNano::new(<span class="number">0</span>, <span class="number">123</span>, <span class="number">0</span>));
     }
 
     <span class="attr">#[test]
