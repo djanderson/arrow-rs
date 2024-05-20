@@ -65,6 +65,20 @@
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -83,6 +97,20 @@
 // under the License.
 
 </span><span class="doccomment">//! Parquet schema definitions and methods to print and parse schema.
+//!
+//! * [`SchemaDescriptor`] describes the data types of the columns stored in a file
+//! * [`ColumnDescriptor`]: Describes the schema of a single (leaf) column.
+//! * [`ColumnPath`]: Represents the location of a column in the schema (e.g. a nested field)
+//!
+//! Parquet distinguishes
+//! between "logical" and "physical" data types.
+//! For instance, strings (logical type) are stored as byte arrays (physical type).
+//! Likewise, temporal types like dates, times, timestamps, etc. (logical type)
+//! are stored as integers (physical type).
+//!
+//! [`SchemaDescriptor`]: types::SchemaDescriptor
+//! [`ColumnDescriptor`]: types::ColumnDescriptor
+//! [`ColumnPath`]: types::ColumnPath
 //!
 //! # Example
 //!

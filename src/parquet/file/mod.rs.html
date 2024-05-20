@@ -107,6 +107,9 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -128,10 +131,13 @@
 //!
 //! Provides access to file and row group readers and writers, record API, metadata, etc.
 //!
-//! See [`serialized_reader::SerializedFileReader`](serialized_reader/struct.SerializedFileReader.html) or
-//! [`writer::SerializedFileWriter`](writer/struct.SerializedFileWriter.html) for a
-//! starting reference, [`metadata::ParquetMetaData`](metadata/index.html) for file
-//! metadata, and [`statistics`](statistics/index.html) for working with statistics.
+//! # See Also:
+//! * [`SerializedFileReader`] and [`SerializedFileWriter`] for reading / writing parquet
+//! * [`metadata`]: for working with metadata such as schema
+//! * [`statistics`]: for working with statistics in metadata
+//!
+//! [`SerializedFileReader`]: serialized_reader::SerializedFileReader
+//! [`SerializedFileWriter`]: writer::SerializedFileWriter
 //!
 //! # Example of writing a new file
 //!
