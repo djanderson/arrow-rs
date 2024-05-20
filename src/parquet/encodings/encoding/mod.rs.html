@@ -1393,7 +1393,7 @@
 // DELTA_BINARY_PACKED encoding
 
 </span><span class="kw">const </span>MAX_PAGE_HEADER_WRITER_SIZE: usize = <span class="number">32</span>;
-<span class="kw">const </span>MAX_BIT_WRITER_SIZE: usize = <span class="number">10 </span>* <span class="number">1024 </span>* <span class="number">1024</span>;
+<span class="kw">const </span>DEFAULT_BIT_WRITER_SIZE: usize = <span class="number">1024 </span>* <span class="number">1024</span>;
 <span class="kw">const </span>DEFAULT_NUM_MINI_BLOCKS: usize = <span class="number">4</span>;
 
 <span class="doccomment">/// Delta bit packed encoder.
@@ -1457,7 +1457,7 @@
 
         DeltaBitPackEncoder {
             page_header_writer: BitWriter::new(MAX_PAGE_HEADER_WRITER_SIZE),
-            bit_writer: BitWriter::new(MAX_BIT_WRITER_SIZE),
+            bit_writer: BitWriter::new(DEFAULT_BIT_WRITER_SIZE),
             total_values: <span class="number">0</span>,
             first_value: <span class="number">0</span>,
             current_value: <span class="number">0</span>, <span class="comment">// current value to keep adding deltas
