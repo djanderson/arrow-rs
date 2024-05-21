@@ -3325,14 +3325,14 @@
 <span class="kw">pub use </span>filter::{ArrowPredicate, ArrowPredicateFn, RowFilter};
 <span class="kw">pub use </span>selection::{RowSelection, RowSelector};
 
-<span class="doccomment">/// A generic builder for constructing sync or async arrow parquet readers. This is not intended
-/// to be used directly, instead you should use the specialization for the type of reader
-/// you wish to use
+<span class="doccomment">/// Builder for constructing parquet readers into arrow.
 ///
-/// * For a synchronous API - [`ParquetRecordBatchReaderBuilder`]
-/// * For an asynchronous API - [`ParquetRecordBatchStreamBuilder`]
+/// Most users should use one of the following specializations:
 ///
-/// [`ParquetRecordBatchStreamBuilder`]: crate::arrow::async_reader::ParquetRecordBatchStreamBuilder
+/// * synchronous API: [`ParquetRecordBatchReaderBuilder::try_new`]
+/// * `async` API: [`ParquetRecordBatchStreamBuilder::new`]
+///
+/// [`ParquetRecordBatchStreamBuilder::new`]: crate::arrow::async_reader::ParquetRecordBatchStreamBuilder::new
 </span><span class="kw">pub struct </span>ArrowReaderBuilder&lt;T&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) input: T,
 
